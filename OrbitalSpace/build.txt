@@ -1,0 +1,3 @@
+displayName = Better Space
+author = LapinGarou
+version = 1.0.0
