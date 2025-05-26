@@ -1,3 +1,0 @@
-displayName = Better Space
-author = LapinGarou
-version = 0.1
