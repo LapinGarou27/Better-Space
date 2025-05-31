@@ -1,63 +1,34 @@
-using System;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Terraria;
 using Terraria.ModLoader;
 using Terraria.Graphics.Effects;
+using Terraria;
+using Microsoft.Xna.Framework;
 
 namespace OrbitalSpace;
 
-public class OrbitalSky : CustomSky
+public class OrbitalSkySystem : ModSystem
 {
-    private bool isActive;
-    private Texture2D skyTexture;
-
-    public override void OnLoad()
+    public override void Load()
     {
-        Main.NewText("OnLoad appelé !", Color.Green);
-        skyTexture = ModContent.Request<Texture2D>("OrbitalSpace/Assets/test").Value;
-    }
-
-    public override void Update(GameTime gameTime) {}
-
-    public override void Draw(SpriteBatch spriteBatch, float minDepth, float maxDepth)
-    {
-        try
+        if (!Main.dedServ)
         {
-
-            var asset = ModContent.Request<Texture2D>("OrbitalSpace/Assets/test");
-            skyTexture = asset.Value;
-        }
-        catch (Exception ex)
-        {
-            // I don't know the purpose of this catch but it make the mod works, So I leave it here...
-        }
-        if (maxDepth >= 0 && minDepth < 1000.0)
-        {
-            spriteBatch.Draw(
-                skyTexture,
-                new Rectangle(0, 0, Main.screenWidth, Main.screenHeight),
-                Color.White * 0.8f
-            );
+            SkyManager.Instance["OrbitalSpace:OrbitalSky"] = new OrbitalSky();
         }
     }
 
-    public override bool IsActive() => isActive;
-
-    public override void Activate(Vector2 position, params object[] args)
+    public override void OnWorldUnload()
     {
-        isActive = true;
+        {
+            if (SkyManager.Instance["OrbitalSpace:OrbitalSky"] is OrbitalSky sky)
+            {
+                sky.Reset();
+            }
+        }
     }
-
-    public override void Deactivate(params object[] args)
+    public override void PostUpdateWorld()
     {
-        isActive = false;
-    }
-
-    public override float GetCloudAlpha() => 0f;
-
-    public override void Reset()
-    {
-        isActive = false;
+        if (!SkyManager.Instance["OrbitalSpace:OrbitalSky"].IsActive())
+        {
+            SkyManager.Instance.Activate("OrbitalSpace:OrbitalSky");
+        }
     }
 }
